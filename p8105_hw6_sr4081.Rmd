@@ -1,0 +1,60 @@
+---
+title: "p8105_hw6_sr4081"
+author: "Samiha Reza"
+date: "2024-12-02"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readr)
+library(readxl)
+library(dplyr)
+library(broom)
+```
+
+## Problem 1
+
+
+
+```{r cars}
+summary(cars)
+```
+
+## Probelm 2
+
+You can also embed plots, for example:
+
+``` {r data }
+url <- "https://raw.githubusercontent.com/washingtonpost/data-homicides/master/homicide-data.csv"
+download.file(url, destfile = "homicide-data.csv")
+
+homicide_data <- read.csv(url) %>%
+    janitor::clean_names() %>%
+    mutate(city_state = paste(city, state, sep = ", "),
+           status = ifelse(disposition %in% c("Closed without arrest", "Open/No arrest"), 0, 1)
+)
+
+homicides_race <- subset(homicide_data, !(city_state %in% c("Dallas, TX", "Phoenix, AZ", "Kansas City, MO", "Tulsa, AL")))
+homicides_race <- subset(subset(homicides_race, victim_race %in% c("White", "Black")))
+homicides_race$victim_age <- as.numeric(homicides_race$victim_age)
+homicides_race <- subset(homicides_race, !is.na(victim_age))
+
+```
+The dataset has `r nrow(homicide_data)` observations and `r ncol(homicide_data)` variables. The variables include `r colnames(homicide_data)`.
+
+```{r baltimore}
+baltimore_data <- homicides_race %>%
+  filter(city_state == "Baltimore, MD")
+
+
+model <- glm(
+  status ~ victim_age + victim_sex + victim_race,
+  data = baltimore_data,
+  family = binomial(link = "logit")
+)
+
+model_results <- broom::tidy(model, conf.int = TRUE, exponentiate = TRUE)
+```
+## Problem 3

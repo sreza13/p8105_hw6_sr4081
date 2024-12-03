@@ -224,4 +224,4 @@ cv_df1 %>%
 )
 
 ```
-The third model has the lowest error (RMSE), and thus the best fit model. 
+The third model has the lowest error (RMSE), and thus the best fit model. I didn't have time to figure out how to use purrr. 
